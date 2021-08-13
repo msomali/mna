@@ -8,25 +8,23 @@ import (
 )
 
 const (
-	tigoCommonName     = "Tigo"
-	vodaCommonName     = "Vodacom"
-	ttclCommonName     = "TTCL"
-	airtelCommonName   = "Airtel"
-	zantelCommonName   = "Zantel"
-	smileCommonName    = "Smile"
-	moCommonName       = "Mo Mobile"
-	viettelCommonName  = "Halotel"
-	mkulimaCommonName  = "Mkulima"
-	wiAfricaCommonName = "Wiafrica"
+	TigoCommonName     = "Tigo"
+	VodaCommonName     = "Vodacom"
+	TtclCommonName     = "TTCL"
+	AirtelCommonName   = "Airtel"
+	ZantelCommonName   = "Zantel"
+	SmileCommonName    = "Smile"
+	MoCommonName       = "Mo Mobile"
+	HalotelCommonName  = "Halotel"
+	MkulimaCommonName  = "Mkulima"
+	WiAfricaCommonName = "Wiafrica"
 	statusOperational  = "Operational"
 )
 
 var (
-
 	ErrOperatorNotFound = errors.New("mobile operator not found")
-	ErrInvalidFormat         = errors.New("invalid format, allowed formats are \"+255765XXXXXX\" and \"0765XXXXXX\"")
-	ErrNumericOnly           = errors.New("phone numbers should contains numeric characters only")
-
+	ErrInvalidFormat    = errors.New("invalid format, allowed formats are \"+255765XXXXXX\" and \"0765XXXXXX\"")
+	ErrNumericOnly      = errors.New("phone numbers should contains numeric characters only")
 
 	tigoPrefixes     = []string{"071", "065", "067"}
 	vodaPrefixes     = []string{"074", "075", "076"}
@@ -45,59 +43,59 @@ var (
 			OperatorName: "MIC Tanzania PLC",
 			Status:       statusOperational,
 			Prefixes:     tigoPrefixes,
-			CommonName:   tigoCommonName,
+			CommonName:   TigoCommonName,
 		},
 		{
 			OperatorName: "Vodacom Tanzania PLC",
-			CommonName:   vodaCommonName,
+			CommonName:   VodaCommonName,
 			Status:       statusOperational,
 			Prefixes:     vodaPrefixes,
 		},
 		{
 			OperatorName: "Tanzania Telecommunications Corporation",
-			CommonName:   ttclCommonName,
+			CommonName:   TtclCommonName,
 			Status:       statusOperational,
 			Prefixes:     ttclPrefixes,
 		},
 		{
 			OperatorName: "Zanzibar Telecom PLC",
-			CommonName:   zantelCommonName,
+			CommonName:   ZantelCommonName,
 			Status:       statusOperational,
 			Prefixes:     zantelPrefixes,
 		},
 		{
 			OperatorName: "Airtel Tanzania PLC",
-			CommonName:   airtelCommonName,
+			CommonName:   AirtelCommonName,
 			Status:       statusOperational,
 			Prefixes:     airtelPrefixes,
 		},
 		{
 			OperatorName: "Smile Communications Tanzania Limited",
-			CommonName:   smileCommonName,
+			CommonName:   SmileCommonName,
 			Status:       statusOperational,
 			Prefixes:     smilePrefixes,
 		},
 		{
 			OperatorName: "Viettel Tanzania PLC",
-			CommonName:   viettelCommonName,
+			CommonName:   HalotelCommonName,
 			Status:       statusOperational,
 			Prefixes:     viettelPrefixes,
 		},
 		{
 			OperatorName: "Mkulima African Telecommunication Company Limited",
-			CommonName:   mkulimaCommonName,
+			CommonName:   MkulimaCommonName,
 			Status:       statusOperational,
 			Prefixes:     mkulimaPrefixes,
 		},
 		{
 			OperatorName: "Wiafrica Tanzania Limited",
-			CommonName:   wiAfricaCommonName,
+			CommonName:   WiAfricaCommonName,
 			Status:       statusOperational,
 			Prefixes:     wiAfricaPrefixes,
 		},
 		{
 			OperatorName: "MO Mobile Holding Limited",
-			CommonName:   moCommonName,
+			CommonName:   MoCommonName,
 			Status:       statusOperational,
 			Prefixes:     moPrefixes,
 		},
@@ -113,10 +111,10 @@ type (
 	}
 )
 
-func CheckNumber(phone string)  (Data,error){
+func CheckNumber(phone string) (Data, error) {
 	//sanitize
 	prefix, err := sanitize(phone)
-	if err != nil{
+	if err != nil {
 		return Data{}, err
 	}
 
@@ -127,43 +125,43 @@ func mergePrefixes() map[string]string {
 	var m map[string]string
 	m = make(map[string]string)
 	for _, prefix := range tigoPrefixes {
-		m[prefix] = tigoCommonName
+		m[prefix] = TigoCommonName
 	}
 
 	for _, prefix := range vodaPrefixes {
-		m[prefix] = vodaCommonName
+		m[prefix] = VodaCommonName
 	}
 
 	for _, prefix := range ttclPrefixes {
-		m[prefix] = ttclCommonName
+		m[prefix] = TtclCommonName
 	}
 
 	for _, prefix := range zantelPrefixes {
-		m[prefix] = zantelCommonName
+		m[prefix] = ZantelCommonName
 	}
 
 	for _, prefix := range airtelPrefixes {
-		m[prefix] = airtelCommonName
+		m[prefix] = AirtelCommonName
 	}
 
 	for _, prefix := range mkulimaPrefixes {
-		m[prefix] = mkulimaCommonName
+		m[prefix] = MkulimaCommonName
 	}
 
 	for _, prefix := range smilePrefixes {
-		m[prefix] = smileCommonName
+		m[prefix] = SmileCommonName
 	}
 
 	for _, prefix := range moPrefixes {
-		m[prefix] = moCommonName
+		m[prefix] = MoCommonName
 	}
 
 	for _, prefix := range viettelPrefixes {
-		m[prefix] = viettelCommonName
+		m[prefix] = HalotelCommonName
 	}
 
 	for _, prefix := range wiAfricaPrefixes {
-		m[prefix] = wiAfricaCommonName
+		m[prefix] = WiAfricaCommonName
 	}
 
 	return m
@@ -229,4 +227,3 @@ func findUsingPrefix(prefix string) (response Data, err error) {
 		return Data{}, ErrOperatorNotFound
 	}
 }
-
