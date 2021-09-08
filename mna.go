@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	TigoCommonName     = "Tigo"
-	VodaCommonName     = "Vodacom"
-	TtclCommonName     = "TTCL"
-	AirtelCommonName   = "Airtel"
-	ZantelCommonName   = "Zantel"
+	Tigo               = "Tigo"
+	Vodacom            = "Vodacom"
+	TTCL               = "TTCL"
+	Airtel             = "Airtel"
+	Zantel             = "Zantel"
 	SmileCommonName    = "Smile"
 	MoCommonName       = "Mo Mobile"
-	HalotelCommonName  = "Halotel"
+	Halotel            = "Halotel"
 	MkulimaCommonName  = "Mkulima"
 	WiAfricaCommonName = "Wiafrica"
 	statusOperational  = "Operational"
@@ -43,29 +43,29 @@ var (
 			OperatorName: "MIC Tanzania PLC",
 			Status:       statusOperational,
 			Prefixes:     tigoPrefixes,
-			CommonName:   TigoCommonName,
+			CommonName:   Tigo,
 		},
 		{
 			OperatorName: "Vodacom Tanzania PLC",
-			CommonName:   VodaCommonName,
+			CommonName:   Vodacom,
 			Status:       statusOperational,
 			Prefixes:     vodaPrefixes,
 		},
 		{
 			OperatorName: "Tanzania Telecommunications Corporation",
-			CommonName:   TtclCommonName,
+			CommonName:   TTCL,
 			Status:       statusOperational,
 			Prefixes:     ttclPrefixes,
 		},
 		{
 			OperatorName: "Zanzibar Telecom PLC",
-			CommonName:   ZantelCommonName,
+			CommonName:   Zantel,
 			Status:       statusOperational,
 			Prefixes:     zantelPrefixes,
 		},
 		{
 			OperatorName: "Airtel Tanzania PLC",
-			CommonName:   AirtelCommonName,
+			CommonName:   Airtel,
 			Status:       statusOperational,
 			Prefixes:     airtelPrefixes,
 		},
@@ -77,7 +77,7 @@ var (
 		},
 		{
 			OperatorName: "Viettel Tanzania PLC",
-			CommonName:   HalotelCommonName,
+			CommonName:   Halotel,
 			Status:       statusOperational,
 			Prefixes:     viettelPrefixes,
 		},
@@ -104,14 +104,49 @@ var (
 
 type (
 	Data struct {
-		OperatorName string   `json:"operator_name"`
-		CommonName   string   `json:"common_name"`
+		OperatorName string   `json:"operator"`
+		CommonName   string   `json:"name"`
 		Status       string   `json:"status"`
 		Prefixes     []string `json:"prefixes"`
 	}
+
+	Prefixes []string
 )
 
-func CheckNumber(phone string) (Data, error) {
+func Format(phoneNumber string) (string,error) {
+	phoneNumber = strings.TrimSpace(phoneNumber)
+	replacer := strings.NewReplacer(" ", "", "-", "", "+", "")
+	phoneNumber = replacer.Replace(phoneNumber)
+	numericOnlyRegexStr := "^[0-9]+$"
+	match, err := regexp.MatchString(numericOnlyRegexStr, phoneNumber)
+	if err != nil {
+		return "", fmt.Errorf("%w: %v", ErrNumericOnly, err)
+	}
+	if !match {
+		return "", ErrNumericOnly
+	}
+	phoneNumberLen := len(phoneNumber)
+
+	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber,"0")
+	startsWith255 := strings.HasPrefix(phoneNumber, "255") && phoneNumberLen == 12
+	startsWithZero := strings.HasPrefix(phoneNumber, "0") && phoneNumberLen == 10
+
+	if withoutZero{
+		return fmt.Sprintf("0%s",phoneNumber),nil
+	}
+
+	if startsWith255{
+		return phoneNumber,nil
+	}
+
+	if startsWithZero{
+		return fmt.Sprintf("255%s",phoneNumber[1:]),nil
+	}
+
+	return "", fmt.Errorf("pass the correct format")
+}
+
+func Details(phone string) (Data, error) {
 	//sanitize
 	prefix, err := sanitize(phone)
 	if err != nil {
@@ -125,23 +160,23 @@ func mergePrefixes() map[string]string {
 	var m map[string]string
 	m = make(map[string]string)
 	for _, prefix := range tigoPrefixes {
-		m[prefix] = TigoCommonName
+		m[prefix] = Tigo
 	}
 
 	for _, prefix := range vodaPrefixes {
-		m[prefix] = VodaCommonName
+		m[prefix] = Vodacom
 	}
 
 	for _, prefix := range ttclPrefixes {
-		m[prefix] = TtclCommonName
+		m[prefix] = TTCL
 	}
 
 	for _, prefix := range zantelPrefixes {
-		m[prefix] = ZantelCommonName
+		m[prefix] = Zantel
 	}
 
 	for _, prefix := range airtelPrefixes {
-		m[prefix] = AirtelCommonName
+		m[prefix] = Airtel
 	}
 
 	for _, prefix := range mkulimaPrefixes {
@@ -157,7 +192,7 @@ func mergePrefixes() map[string]string {
 	}
 
 	for _, prefix := range viettelPrefixes {
-		m[prefix] = HalotelCommonName
+		m[prefix] = Halotel
 	}
 
 	for _, prefix := range wiAfricaPrefixes {

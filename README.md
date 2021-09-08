@@ -17,20 +17,20 @@ package example
 
 import (
 	"fmt"
-	"github.com/techcraftt/mna"
+	"github.com/techcraftlabs/mna"
 	"strings"
 )
 
-func Example_CheckNumber()  {
+func Example_Details()  {
 
 	phone := "0765992100"
-	response, err := mna.CheckNumber(phone)
+	response, err := mna.Details(phone)
 	if err != nil{
 		fmt.Printf("error occurred: %v\n",err)
 		return
 	}
 	
-	if response.CommonName == mna.AirtelCommonName{
+	if response.CommonName == mna.Airtel{
 		fmt.Printf("Yes the Provided Number belongs to Airtel")
 		return
 	}else {
