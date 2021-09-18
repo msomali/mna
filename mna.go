@@ -103,6 +103,8 @@ var (
 )
 
 type (
+
+	// Data contains basic details of a phone number include the mno
 	Data struct {
 		OperatorName string   `json:"operator"`
 		CommonName   string   `json:"name"`
@@ -113,6 +115,12 @@ type (
 	Prefixes []string
 )
 
+
+// Format return a phone number starting with 255 or error
+// if it can not be formatted.
+// It tries it best to remove white spaces or hyphens put in between
+// numbers and a plus sign at the beginning then replace 0 with 255
+// if need be
 func Format(phoneNumber string) (string,error) {
 	phoneNumber = strings.TrimSpace(phoneNumber)
 	replacer := strings.NewReplacer(" ", "", "-", "", "+", "")
@@ -132,7 +140,7 @@ func Format(phoneNumber string) (string,error) {
 	startsWithZero := strings.HasPrefix(phoneNumber, "0") && phoneNumberLen == 10
 
 	if withoutZero{
-		return fmt.Sprintf("0%s",phoneNumber),nil
+		return fmt.Sprintf("255%s",phoneNumber),nil
 	}
 
 	if startsWith255{
@@ -146,6 +154,9 @@ func Format(phoneNumber string) (string,error) {
 	return "", fmt.Errorf("pass the correct format")
 }
 
+
+// Details returns Data or err if the phone number inserted is not
+// correct. after trying to sanitize it
 func Details(phone string) (Data, error) {
 	//sanitize
 	prefix, err := sanitize(phone)
@@ -218,16 +229,17 @@ func sanitize(phoneNumber string) (string, error) {
 	if !match {
 		return "", ErrNumericOnly
 	}
-	if len(phoneNumber) == 3 && strings.HasPrefix(phoneNumber, "0") {
-		return phoneNumber, nil
-	}
+	phoneNumberLen := len(phoneNumber)
 
-	if len(phoneNumber) != 10 && len(phoneNumber) != 12 {
+	// the number len is not correct
+	isWrongLen := phoneNumberLen !=9 && phoneNumberLen != 10 && phoneNumberLen != 12
+	if isWrongLen{
 		return "", ErrInvalidFormat
 	}
 
-	startsWith255 := strings.HasPrefix(phoneNumber, "255") && len(phoneNumber) == 12
-	startsWithZero := strings.HasPrefix(phoneNumber, "0") && len(phoneNumber) == 10
+	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber,"0")
+	startsWith255 := strings.HasPrefix(phoneNumber, "255") && phoneNumberLen== 12
+	startsWithZero := strings.HasPrefix(phoneNumber, "0") && phoneNumberLen == 10
 
 	if startsWithZero {
 		chars := []rune(phoneNumber)
@@ -237,6 +249,10 @@ func sanitize(phoneNumber string) (string, error) {
 		chars := []rune(phoneNumber)
 		prefix := "0" + string(chars[3:5])
 		return prefix, err
+	}else if withoutZero{
+		chars := []rune(phoneNumber)
+		prefix := string(chars[0:2])
+		return fmt.Sprintf("0%s",prefix), err
 	} else {
 		return "", ErrInvalidFormat
 	}

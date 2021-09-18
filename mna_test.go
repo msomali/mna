@@ -1,7 +1,6 @@
-package mna_test
+package mna
 
 import (
-	"github.com/techcraftt/mna"
 	"reflect"
 	"testing"
 )
@@ -40,10 +39,26 @@ func TestFormat(t *testing.T) {
 			want:    "255765992153",
 			wantErr: false,
 		},
+		{
+			name: "test without zero",
+			args: args{
+				phoneNumber: "765992153",
+			},
+			want:    "255765992153",
+			wantErr: false,
+		},
+		{
+			name: "test with spaces",
+			args: args{
+				phoneNumber: "0765 992 153",
+			},
+			want:    "255765992153",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := mna.Format(tt.args.phoneNumber)
+			got, err := Format(tt.args.phoneNumber)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Format() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -62,7 +77,7 @@ func TestDetails(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    mna.Data
+		want    Data
 		wantErr bool
 	}{
 		{
@@ -70,13 +85,31 @@ func TestDetails(t *testing.T) {
 			args:    args{
 				phone: "+255 765 992 153",
 			},
-			want:    mna.Data{},
+			want:    Data{
+				OperatorName: "Vodacom Tanzania PLC",
+				CommonName:   Vodacom,
+				Status:       statusOperational,
+				Prefixes:     vodaPrefixes,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "test ridiculous number",
+			args:    args{
+				phone: "765 992 153",
+			},
+			want:    Data{
+				OperatorName: "Vodacom Tanzania PLC",
+				CommonName:   Vodacom,
+				Status:       statusOperational,
+				Prefixes:     vodaPrefixes,
+			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := mna.Details(tt.args.phone)
+			got, err := Details(tt.args.phone)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Details() error = %v, wantErr %v", err, tt.wantErr)
 				return
