@@ -1,3 +1,3 @@
-module github.com/techcraftt/mna
+module github.com/techcraftlabs/mna
 
 go 1.16
