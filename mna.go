@@ -23,7 +23,7 @@ const (
 
 var (
 	ErrOperatorNotFound = errors.New("mobile operator not found")
-	ErrInvalidFormat    = errors.New("invalid format, allowed formats are \"+255765XXXXXX\" and \"0765XXXXXX\"")
+	ErrInvalidFormat    = errors.New("invalid format, correct formats are +255[9-digits], 255[9-digits], 0[9-digits] or just last 9 digits")
 	ErrNumericOnly      = errors.New("phone numbers should contains numeric characters only")
 
 	tigoPrefixes     = []string{"071", "065", "067"}
