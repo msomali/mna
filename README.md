@@ -23,22 +23,11 @@ import (
 
 func Example_Details()  {
 
-	phone := "0765992100"
-	response, err := mna.Details(phone)
-	if err != nil{
-		fmt.Printf("error occurred: %v\n",err)
-		return
-	}
+	info, err := mna.Information("+255788888888")
+	if err != nil {
+        fmt.Println(err)
+    }
 	
-	if response.CommonName == mna.Airtel{
-		fmt.Printf("Yes the Provided Number belongs to Airtel")
-		return
-	}else {
-		fmt.Printf("The Provided Number does not belong to Airtel but to %s\n", response.CommonName)
-		fmt.Printf("operationsal status of the number is %s\n", response.Status)
-		fmt.Printf("the official registered name of the provider is %s\n", response.OperatorName)
-		fmt.Printf("All the prefixes owned by the operator are %s\n", strings.Join(response.Prefixes, ","))
-		return
-	}
+	operator, err := mna.Get("+25576282735343535")
 }
 ```

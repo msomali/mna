@@ -7,18 +7,43 @@ import (
 	"strings"
 )
 
+var _ operator = (*Operator)(nil)
+
 const (
-	Tigo               = "Tigo"
-	Vodacom            = "Vodacom"
-	TTCL               = "TTCL"
-	Airtel             = "Airtel"
-	Zantel             = "Zantel"
-	SmileCommonName    = "Smile"
-	MoCommonName       = "Mo Mobile"
-	Halotel            = "Halotel"
-	MkulimaCommonName  = "Mkulima"
-	WiAfricaCommonName = "Wiafrica"
-	statusOperational  = "Operational"
+	Tigo Operator = iota
+	Vodacom
+	TTCL
+	Airtel
+	Zantel
+	Smile
+	MoMobile
+	Halotel
+	Mkulima
+	WiAfrica
+)
+
+const (
+	registeredTigoName     = "MIC Tanzania PLC"
+	registeredVodacomName  = "Vodacom Tanzania PLC"
+	registeredTTCLName     = "Tanzania Telecommunications Corporation"
+	registeredAirtelName   = "Airtel Tanzania PLC"
+	registeredZantelName   = "Zanzibar Telecom PLC"
+	registeredSmileName    = "Smile Communications Tanzania Limited"
+	registeredMoMobileName = "MO Mobile Holding Limited"
+	registeredHalotelName  = "Viettel Tanzania PLC"
+	registeredMkulimaName  = "Mkulima African Telecommunication Company Limited"
+	registeredWiAfricaName = "Wiafrica Tanzania Limited"
+	commonTigoName         = "Tigo"
+	commonVodacomName      = "Vodacom"
+	commonTTCLName         = "TTCL"
+	commonAirtelName       = "Airtel"
+	commonZantelName       = "Zantel"
+	commonSmileName        = "Smile"
+	commonMoName           = "Mo Mobile"
+	commonHalotelName      = "Halotel"
+	commonMkulimaName      = "Mkulima"
+	commonWiAfricaName     = "Wiafrica"
+	StatusOperational      = "Operational"
 )
 
 var (
@@ -29,99 +54,103 @@ var (
 	tigoPrefixes     = []string{"071", "065", "067"}
 	vodaPrefixes     = []string{"074", "075", "076"}
 	ttclPrefixes     = []string{"073"}
-	zantelPrefixes   = []string{"077"}
 	airtelPrefixes   = []string{"078", "068", "069"}
+	zantelPrefixes   = []string{"077"}
 	smilePrefixes    = []string{"066"}
+	moPrefixes       = []string{"072"}
 	viettelPrefixes  = []string{"061", "062"}
 	mkulimaPrefixes  = []string{"063"}
 	wiAfricaPrefixes = []string{"064"}
-	moPrefixes       = []string{"072"}
 
-	repository = []Data{
-
-		{
-			OperatorName: "MIC Tanzania PLC",
-			Status:       statusOperational,
-			Prefixes:     tigoPrefixes,
-			CommonName:   Tigo,
-		},
-		{
-			OperatorName: "Vodacom Tanzania PLC",
-			CommonName:   Vodacom,
-			Status:       statusOperational,
-			Prefixes:     vodaPrefixes,
-		},
-		{
-			OperatorName: "Tanzania Telecommunications Corporation",
-			CommonName:   TTCL,
-			Status:       statusOperational,
-			Prefixes:     ttclPrefixes,
-		},
-		{
-			OperatorName: "Zanzibar Telecom PLC",
-			CommonName:   Zantel,
-			Status:       statusOperational,
-			Prefixes:     zantelPrefixes,
-		},
-		{
-			OperatorName: "Airtel Tanzania PLC",
-			CommonName:   Airtel,
-			Status:       statusOperational,
-			Prefixes:     airtelPrefixes,
-		},
-		{
-			OperatorName: "Smile Communications Tanzania Limited",
-			CommonName:   SmileCommonName,
-			Status:       statusOperational,
-			Prefixes:     smilePrefixes,
-		},
-		{
-			OperatorName: "Viettel Tanzania PLC",
-			CommonName:   Halotel,
-			Status:       statusOperational,
-			Prefixes:     viettelPrefixes,
-		},
-		{
-			OperatorName: "Mkulima African Telecommunication Company Limited",
-			CommonName:   MkulimaCommonName,
-			Status:       statusOperational,
-			Prefixes:     mkulimaPrefixes,
-		},
-		{
-			OperatorName: "Wiafrica Tanzania Limited",
-			CommonName:   WiAfricaCommonName,
-			Status:       statusOperational,
-			Prefixes:     wiAfricaPrefixes,
-		},
-		{
-			OperatorName: "MO Mobile Holding Limited",
-			CommonName:   MoCommonName,
-			Status:       statusOperational,
-			Prefixes:     moPrefixes,
-		},
-	}
 )
 
 type (
+	Operator int8
 
-	// Data contains basic details of a phone number include the mno
-	Data struct {
-		OperatorName string   `json:"operator"`
-		CommonName   string   `json:"name"`
-		Status       string   `json:"status"`
-		Prefixes     []string `json:"prefixes"`
+	// Info contains basic details of a phone number include the mno
+	Info struct {
+		Operator        Operator `json:"operator"`
+		FormattedNumber string   `json:"formatted_number"`
 	}
 
-	Prefixes []string
+	FilterOperatorFunc func(op Operator) bool
+	FilterPhoneFunc    func(phone string) bool
+
+	operator interface {
+		fmt.Stringer
+		Prefixes() []string
+		RegisteredName() string
+		CommonName() string
+		Status() string
+	}
 )
 
+func (op Operator) Prefixes() []string {
+	prefixes := [][]string{
+		tigoPrefixes,
+		vodaPrefixes,
+		ttclPrefixes,
+		zantelPrefixes,
+		airtelPrefixes,
+		smilePrefixes,
+		moPrefixes,
+		viettelPrefixes,
+		mkulimaPrefixes,
+		wiAfricaPrefixes,
+	}
 
-// Format return a phone number starting with 255 or error
+	return prefixes[op]
+}
+
+func (op Operator) RegisteredName() string {
+	registeredNames := []string{
+        registeredTigoName,
+        registeredVodacomName,
+        registeredTTCLName,
+        registeredZantelName,
+        registeredAirtelName,
+        registeredSmileName,
+        registeredMoMobileName,
+        registeredHalotelName,
+        registeredMkulimaName,
+        registeredWiAfricaName,
+    }
+
+	return registeredNames[op]
+}
+
+func (op Operator) CommonName() string {
+	commonNames := []string{
+        commonTigoName,
+        commonVodacomName,
+        commonTTCLName,
+        commonZantelName,
+        commonAirtelName,
+        commonSmileName,
+        commonMoName,
+        commonHalotelName,
+        commonMkulimaName,
+        commonWiAfricaName,
+    }
+    return commonNames[op]
+}
+
+func (op Operator) Status() string {
+	return StatusOperational
+}
+
+func (op Operator) String() string {
+	return fmt.Sprintf("registered name: %s, common name :%s, status: %s, prefixes :%v\n",
+		op.RegisteredName(),op.CommonName(),op.Status(),op.Prefixes())
+}
+
+
+// format return a phone number starting with 255 or error
 // if it can not be formatted.
 // It tries it best to remove white spaces or hyphens put in between
 // numbers and a plus sign at the beginning then replace 0 with 255
 // if need be
-func Format(phoneNumber string) (string,error) {
+func format(phoneNumber string) (string, error) {
 	phoneNumber = strings.TrimSpace(phoneNumber)
 	replacer := strings.NewReplacer(" ", "", "-", "", "+", "")
 	phoneNumber = replacer.Replace(phoneNumber)
@@ -135,41 +164,28 @@ func Format(phoneNumber string) (string,error) {
 	}
 	phoneNumberLen := len(phoneNumber)
 
-	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber,"0")
+	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber, "0")
 	startsWith255 := strings.HasPrefix(phoneNumber, "255") && phoneNumberLen == 12
 	startsWithZero := strings.HasPrefix(phoneNumber, "0") && phoneNumberLen == 10
 
-	if withoutZero{
-		return fmt.Sprintf("255%s",phoneNumber),nil
+	if withoutZero {
+		return fmt.Sprintf("255%s", phoneNumber), nil
 	}
 
-	if startsWith255{
-		return phoneNumber,nil
+	if startsWith255 {
+		return phoneNumber, nil
 	}
 
-	if startsWithZero{
-		return fmt.Sprintf("255%s",phoneNumber[1:]),nil
+	if startsWithZero {
+		return fmt.Sprintf("255%s", phoneNumber[1:]), nil
 	}
 
 	return "", fmt.Errorf("pass the correct format")
 }
 
-
-// Details returns Data or err if the phone number inserted is not
-// correct. after trying to sanitize it
-func Details(phone string) (Data, error) {
-	//sanitize
-	prefix, err := sanitize(phone)
-	if err != nil {
-		return Data{}, err
-	}
-
-	return findUsingPrefix(prefix)
-}
-
-func mergePrefixes() map[string]string {
-	var m map[string]string
-	m = make(map[string]string)
+func mergePrefixes() map[string]Operator {
+	var m map[string]Operator
+	m = make(map[string]Operator)
 	for _, prefix := range tigoPrefixes {
 		m[prefix] = Tigo
 	}
@@ -191,15 +207,15 @@ func mergePrefixes() map[string]string {
 	}
 
 	for _, prefix := range mkulimaPrefixes {
-		m[prefix] = MkulimaCommonName
+		m[prefix] = Mkulima
 	}
 
 	for _, prefix := range smilePrefixes {
-		m[prefix] = SmileCommonName
+		m[prefix] = Smile
 	}
 
 	for _, prefix := range moPrefixes {
-		m[prefix] = MoCommonName
+		m[prefix] = MoMobile
 	}
 
 	for _, prefix := range viettelPrefixes {
@@ -207,7 +223,7 @@ func mergePrefixes() map[string]string {
 	}
 
 	for _, prefix := range wiAfricaPrefixes {
-		m[prefix] = WiAfricaCommonName
+		m[prefix] = WiAfrica
 	}
 
 	return m
@@ -232,13 +248,13 @@ func sanitize(phoneNumber string) (string, error) {
 	phoneNumberLen := len(phoneNumber)
 
 	// the number len is not correct
-	isWrongLen := phoneNumberLen !=9 && phoneNumberLen != 10 && phoneNumberLen != 12
-	if isWrongLen{
+	isWrongLen := phoneNumberLen != 9 && phoneNumberLen != 10 && phoneNumberLen != 12
+	if isWrongLen {
 		return "", ErrInvalidFormat
 	}
 
-	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber,"0")
-	startsWith255 := strings.HasPrefix(phoneNumber, "255") && phoneNumberLen== 12
+	withoutZero := phoneNumberLen == 9 && !strings.HasPrefix(phoneNumber, "0")
+	startsWith255 := strings.HasPrefix(phoneNumber, "255") && phoneNumberLen == 12
 	startsWithZero := strings.HasPrefix(phoneNumber, "0") && phoneNumberLen == 10
 
 	if startsWithZero {
@@ -249,32 +265,131 @@ func sanitize(phoneNumber string) (string, error) {
 		chars := []rune(phoneNumber)
 		prefix := "0" + string(chars[3:5])
 		return prefix, err
-	}else if withoutZero{
+	} else if withoutZero {
 		chars := []rune(phoneNumber)
 		prefix := string(chars[0:2])
-		return fmt.Sprintf("0%s",prefix), err
+		return fmt.Sprintf("0%s", prefix), err
 	} else {
 		return "", ErrInvalidFormat
 	}
 
 }
 
-func findUsingPrefix(prefix string) (response Data, err error) {
+func findUsingPrefix(prefix string) (op Operator, err error) {
 
 	m := mergePrefixes()
-	operator := m[prefix]
-	var found bool
 
-	for _, data := range repository {
-		if data.CommonName == operator {
-			found = true
-			response = data
+	op, ok := m[prefix]
+
+	if !ok {
+        return -1, ErrOperatorNotFound
+    }
+
+	return op, nil
+
+}
+
+func Get(phoneNumber string)(Operator,error){
+
+    prefix, err := sanitize(phoneNumber)
+    if err != nil {
+        return -1, err
+    }
+
+    op, err := findUsingPrefix(prefix)
+    if err != nil {
+        return -1, err
+    }
+
+    return op, nil
+
+}
+
+func GetAndFilter(phoneNumber string, f1 FilterPhoneFunc, f2 FilterOperatorFunc)(Operator,error){
+
+	var (
+		passFilterOne bool
+		passFilterTwo bool
+	)
+
+	s, err := format(phoneNumber)
+	if err != nil {
+		return -1, err
+	}
+
+	if f1 != nil {
+        passFilterOne = f1(s)
+		if !passFilterOne{
+			return -1, errors.New("could not pass set filters")
+		}
+    }
+	op, err := Get(s)
+	if err != nil{
+		return -1, err
+	}
+	if f2 != nil{
+		passFilterTwo = f2(op)
+		if !passFilterTwo{
+			return -1, errors.New("could not pass set filters")
 		}
 	}
 
-	if found {
-		return response, nil
-	} else {
-		return Data{}, ErrOperatorNotFound
+	return op,nil
+}
+
+func Information(phoneNumber string)(*Info,error){
+
+    fmtNumber, err := format(phoneNumber)
+	if err != nil{
+		return nil,err
 	}
+    op, err := Get(phoneNumber)
+    if err != nil {
+        return nil, err
+    }
+
+
+	info := &Info{
+		Operator:        op,
+		FormattedNumber: fmtNumber,
+	}
+
+    return info, nil
+
+}
+
+func InfoAfterFilters(phoneNumber string, f1 FilterPhoneFunc, f2 FilterOperatorFunc)(*Info,error){
+
+	var (
+		passFilterOne bool
+		passFilterTwo bool
+	)
+	fmtNumber, err := format(phoneNumber)
+	if err != nil{
+		return nil,err
+	}
+
+	if f1 != nil {
+		passFilterOne = f1(fmtNumber)
+		if !passFilterOne{
+			return nil, errors.New("could not pass set filters")
+		}
+	}
+	op, err := Get(fmtNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	if f2 != nil{
+		passFilterTwo = f2(op)
+		if !passFilterTwo{
+			return nil, errors.New("could not pass set filters")
+		}
+	}
+	info := &Info{
+		Operator:        op,
+		FormattedNumber: fmtNumber,
+	}
+
+	return info, nil
 }
