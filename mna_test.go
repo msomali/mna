@@ -37,7 +37,6 @@ func OperatorsListFilter(ops ...mna.Operator) mna.FilterOperatorFunc {
 	}
 }
 
-
 func TestGet(t *testing.T) {
 	type args struct {
 		phoneNumber string
@@ -49,16 +48,16 @@ func TestGet(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "test vodacom number",
-			args:    args{
+			name: "test vodacom number",
+			args: args{
 				phoneNumber: "0765999999",
 			},
 			want:    mna.Vodacom,
 			wantErr: false,
 		},
 		{
-			name:    "test tigo number",
-			args:    args{
+			name: "test tigo number",
+			args: args{
 				phoneNumber: "0712999999",
 			},
 			want:    mna.Tigo,
@@ -82,7 +81,7 @@ func TestGet(t *testing.T) {
 func TestGetThenFilter(t *testing.T) {
 	type args struct {
 		phoneNumber string
-		f2           mna.FilterOperatorFunc
+		f2          mna.FilterOperatorFunc
 		f1          mna.FilterPhoneFunc
 	}
 	tests := []struct {
@@ -92,10 +91,10 @@ func TestGetThenFilter(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "test filter with suffix and pass tigo and vodacom numbers only",
-			args:    args{
+			name: "test filter with suffix and pass tigo and vodacom numbers only",
+			args: args{
 				phoneNumber: "0712915799",
-				f2:           OperatorsListFilter(mna.Tigo, mna.Vodacom),
+				f2:          OperatorsListFilter(mna.Tigo, mna.Vodacom),
 				f1:          FilterBySuffix("799"),
 			},
 			want:    mna.Tigo,
@@ -119,44 +118,43 @@ func TestGetThenFilter(t *testing.T) {
 func TestRandomAndFilters(t *testing.T) {
 
 	type args struct {
-		len int
+		len    int
 		suffix string
-		ops  []mna.Operator
+		ops    []mna.Operator
 	}
 
-	f1 := func (suffix string)mna.FilterPhoneFunc{
+	f1 := func(suffix string) mna.FilterPhoneFunc {
 		return func(phone string) bool {
-            return strings.HasSuffix(phone, suffix)
-        }
-    }
+			return strings.HasSuffix(phone, suffix)
+		}
+	}
 
-	f2 := func(ops...mna.Operator)mna.FilterOperatorFunc{
-        return func(op mna.Operator) bool {
-            for _, operator := range ops {
-                if op == operator {
-                    return true
-                }
-            }
+	f2 := func(ops ...mna.Operator) mna.FilterOperatorFunc {
+		return func(op mna.Operator) bool {
+			for _, operator := range ops {
+				if op == operator {
+					return true
+				}
+			}
 
-            return false
-        }
-    }
+			return false
+		}
+	}
 
 	//numbers := rand.GenerateNWithFilters(1000,f1("99"),f2(mna.Tigo,mna.Vodacom))
 
-    tests := []struct {
-        name    string
-        args    args
-
-    }{
-        {
-            name:    "randomly generate 100 numbers that ends with 799 and are either Tigo/Voda/Airtel",
-            args:    args{
-				len: 100,
-                suffix: "799",
-                ops: []mna.Operator{mna.Tigo, mna.Vodacom,mna.Airtel},
-            },
-        },
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "randomly generate 100 numbers that ends with 799 and are either Tigo/Voda/Airtel",
+			args: args{
+				len:    100,
+				suffix: "799",
+				ops:    []mna.Operator{mna.Tigo, mna.Vodacom, mna.Airtel},
+			},
+		},
 		{
 			name: "generate 10 halotel number that has 300 as suffix",
 			args: args{
@@ -165,19 +163,19 @@ func TestRandomAndFilters(t *testing.T) {
 				ops:    []mna.Operator{mna.Halotel},
 			},
 		},
-    }
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-           got := rand.GenerateNWithFilters(tt.args.len,f1(tt.args.suffix),f2(tt.args.ops...))
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := rand.GenerateNWithFilters(tt.args.len, f1(tt.args.suffix), f2(tt.args.ops...))
 
-		   if len(got) != tt.args.len {
-			   t.Errorf("GenerateNWithFilters() got = %v, want %v", len(got), tt.args.len)
-           }
+			if len(got) != tt.args.len {
+				t.Errorf("GenerateNWithFilters() got = %v, want %v", len(got), tt.args.len)
+			}
 
 			for i := 0; i < len(got); i++ {
 				t.Logf("%d: %s\n", i, got[i])
 			}
-        })
+		})
 
-    }
+	}
 }

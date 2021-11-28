@@ -25,8 +25,8 @@ func TestGenerateN(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := GenerateN(tt.args.len)
 			if len(got) != tt.args.len {
-                t.Errorf("GenerateN() = %v, want %v", len(got), tt.args.len)
-            }
+				t.Errorf("GenerateN() = %v, want %v", len(got), tt.args.len)
+			}
 		})
 	}
 }
