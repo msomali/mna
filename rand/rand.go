@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func prefix() string {
@@ -60,10 +60,23 @@ func GenerateNWithFilters(n int, f1 mna.FilterPhoneFunc, f2 mna.FilterOperatorFu
 	for i < n {
 		number := Generate()
 		op,_ := mna.Get(number)
-        if f1(number) && f2(op) {
-            numbers = append(numbers, number)
-            i++
-        }
+		if f1!=nil && f2!=nil {
+			if f1(number) && f2(op) {
+				numbers = append(numbers, number)
+				i++
+			}
+		}else if f1!=nil {
+            if f1(number) {
+                numbers = append(numbers, number)
+                i++
+            }
+		}else {
+			if f2(op) {
+                numbers = append(numbers, number)
+                i++
+            }
+		}
+
 	}
     return numbers
 }

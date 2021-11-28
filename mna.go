@@ -13,8 +13,8 @@ const (
 	Tigo Operator = iota
 	Vodacom
 	TTCL
-	Airtel
 	Zantel
+	Airtel
 	Smile
 	MoMobile
 	Halotel
