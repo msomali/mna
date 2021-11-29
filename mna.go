@@ -390,3 +390,34 @@ func InfoAfterFilters(phoneNumber string, f1 FilterPhoneFunc, f2 FilterOperatorF
 
 	return info, nil
 }
+
+func OpFromString(s string) (Operator, error) {
+	s = strings.TrimSpace(strings.ToLower(s))
+	if s == "" {
+		return -1, fmt.Errorf("error: empty name")
+	} else {
+		if s == strings.ToLower(commonTigoName) {
+			return Tigo, nil
+		} else if s == strings.ToLower(commonVodacomName) {
+			return Vodacom, nil
+		} else if s == strings.ToLower(commonTTCLName) {
+			return TTCL, nil
+		} else if s == strings.ToLower(commonZantelName) {
+			return Zantel, nil
+		} else if s == strings.ToLower(commonAirtelName) {
+			return Airtel, nil
+		} else if s == strings.ToLower(commonSmileName) {
+			return Smile, nil
+		} else if s == strings.ToLower(commonMoName) {
+			return MoMobile, nil
+		} else if s == strings.ToLower(commonHalotelName) {
+			return Halotel, nil
+		} else if s == strings.ToLower(commonWiAfricaName) {
+			return WiAfrica, nil
+		} else if s == strings.ToLower(commonMkulimaName) {
+			return Mkulima, nil
+		} else {
+			return -1, fmt.Errorf("error: operator not found")
+		}
+	}
+}
